@@ -7,7 +7,7 @@ from uuid import uuid4
 
 
 def _s3_key(env: str, data_type: str, filename: str) -> str:
-    return f"{env}/{data_type}/{dt.datetime.utcnow():%Y-%m-%d}/{filename}"
+    return f"{env}/{data_type}/{dt.datetime.now(dt.timezone.utc):%Y-%m-%d}/{filename}"
 
 
 def handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
