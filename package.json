@@ -1,0 +1,14 @@
+{
+  "name": "geodrill",
+  "private": true,
+  "workspaces": [
+    "apps/frontend",
+    "packages/shared",
+    "infrastructure"
+  ],
+  "scripts": {
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present"
+  }
+}
