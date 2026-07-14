@@ -4,7 +4,7 @@ from enum import Enum
 from typing import List, Optional
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class RiskLevel(str, Enum):
@@ -20,6 +20,14 @@ class BoundingBox(BaseModel):
     max_lat: float = Field(ge=-90, le=90)
     crs: str = Field(default="EPSG:4326")
 
+    @model_validator(mode="after")
+    def _check_order(self) -> "BoundingBox":
+        if self.max_lon <= self.min_lon:
+            raise ValueError("max_lon must be greater than min_lon")
+        if self.max_lat <= self.min_lat:
+            raise ValueError("max_lat must be greater than min_lat")
+        return self
+
 
 class AnalyzeRequest(BaseModel):
     bbox: BoundingBox
@@ -29,7 +37,10 @@ class AnalyzeRequest(BaseModel):
 class AnalyzeResponse(BaseModel):
     request_id: UUID = Field(default_factory=uuid4)
     job_id: UUID = Field(default_factory=uuid4)
-    status: str = "queued"
+    status: str = "completed"
+    mean_probability: float
+    confidence: float
+    overall_risk: RiskLevel
 
 
 class WellRecord(BaseModel):
@@ -63,4 +74,7 @@ class ReportResponse(BaseModel):
     request_id: UUID = Field(default_factory=uuid4)
     job_id: UUID
     summary: str
+    mean_probability: float
+    confidence: float
+    overall_risk: RiskLevel
     recommendations: List[ZoneInsight]
